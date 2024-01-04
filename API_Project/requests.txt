@@ -1,4 +1,5 @@
 django
 mssql-django
 djangorestframework
-
+django-cors-headers
+Pillow # for images upload
