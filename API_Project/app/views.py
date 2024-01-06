@@ -19,15 +19,17 @@ def _checklogin(request):
             user.role_id=str(user.role_id)
             # Password matches - user authenticated
             user_dict=model_to_dict(user)
-            return Response(user_dict)
+            msg={'MsgType':'success'}
+            return Response(user_dict|msg)
         else:
-            return Response({'msg': 'Password Incorect'})
+            return Response({'msg': 'Password Incorect','MsgType':'warning'})
     except User_roles.DoesNotExist:
-        return Response({'msg': 'Authentication failed'})
+        return Response({'msg': 'Authentication failed','MsgType':'danger'})
     
 # Create User [Admin,employee,customer]
 @api_view(['POST'])
 def _CreateUsers(request):
+    print("here-------------")
     username=request.data.get('username')
     firstname=request.data.get('firstname')
     lastname=request.data.get('lastname')
@@ -35,8 +37,14 @@ def _CreateUsers(request):
     phone=request.data.get('phone')
     password=request.data.get('password')
     confirm_Password=request.data.get('confirm_Password')
-    role_id=request.data.get('role_id')
+    # role_id=request.data.get('role_id')
+    role_id=3
+    # role_id=request.data.get('role_id')
+    existing_user = User_roles.objects.filter(username=username).exists()
 
+    if (existing_user):
+        return Response({'msg':'Already username exists...','MsgType':'warning'})
+    
     if password == confirm_Password:
         obj=User_roles()
         obj.username=username
@@ -52,7 +60,7 @@ def _CreateUsers(request):
         elif role_id==3:
             return Response({'msg':'Successfully Register the customer...','MsgType':'success'})
         else:
-            return Response({'msg':'Successfully Register the customer...','MsgType':'danger'})
+            return Response({'msg':'Successfully Register the customer...','MsgType':'success'})
     else:
         return Response({'msg':'password is not maching the confirm password','MsgType':'danger'})
 
