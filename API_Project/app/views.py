@@ -1,10 +1,13 @@
 from django.shortcuts import render,HttpResponse
 from .models import User_roles
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.decorators  import api_view
 import pandas as pd
 from django.forms.models import model_to_dict
-from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
+import re
+# from rest_framework_simplejwt.tokens import  RefreshToken
 # from django.contrib.auth.hashers import check_password
 # Create your views here.
 
@@ -13,11 +16,11 @@ from django.views.decorators.csrf import csrf_exempt
 def _checklogin(request):
     username=request.data.get('username')
     password=request.data.get('password')
+    # csrf_token = get_token(request)
     try:
         user = User_roles.objects.get(username=username)
         if (user.password == password):
             user.role_id=str(user.role_id)
-            # Password matches - user authenticated
             user_dict=model_to_dict(user)
             msg={'MsgType':'success'}
             return Response(user_dict|msg)
@@ -26,10 +29,20 @@ def _checklogin(request):
     except User_roles.DoesNotExist:
         return Response({'msg': 'Authentication failed','MsgType':'danger'})
     
+
+def Validate_password(password):
+    if len(password) < 8:  
+        return "Password sould be more than 8 charactors"  
+    if not re.search("[a-z]", password):  
+        return "Password soud have lowerletter case"  
+    if not re.search("[A-Z]", password):  
+        return "Password soud have Upperletter case"  
+    if not re.search("[0-9]", password):  
+        return 'Password soud have numaricValues'  
+    return "Validate"  
 # Create User [Admin,employee,customer]
 @api_view(['POST'])
 def _CreateUsers(request):
-    print("here-------------")
     username=request.data.get('username')
     firstname=request.data.get('firstname')
     lastname=request.data.get('lastname')
@@ -39,13 +52,19 @@ def _CreateUsers(request):
     confirm_Password=request.data.get('confirm_Password')
     # role_id=request.data.get('role_id')
     role_id=3
-    # role_id=request.data.get('role_id')
+    # Check for if the user already exist or not
     existing_user = User_roles.objects.filter(username=username).exists()
 
     if (existing_user):
         return Response({'msg':'Already username exists...','MsgType':'warning'})
     
     if password == confirm_Password:
+        msg=Validate_password(password)
+        if msg=="Validate":  
+             pass
+        else:  
+            return Response({'msg':msg,'MsgType':'warning'})
+    
         obj=User_roles()
         obj.username=username
         obj.firstname=firstname
@@ -54,6 +73,7 @@ def _CreateUsers(request):
         obj.phone=phone
         obj.password=password
         obj.role_id=role_id
+        
         obj.save()
         if role_id==2:
             return Response({'msg':'Successfully creat the employee...','MsgType':'success'})
@@ -87,6 +107,11 @@ def _Click_Update(request,id):
     address=request.data.get('address')
     phone=request.data.get('phone')
     role_id=request.data.get('role_id')
+
+    existing_user = User_roles.objects.filter(username=username).exists()
+
+    if (existing_user):
+        return Response({'msg':'Already username exists...','MsgType':'warning'})
 
     obj = User_roles.objects.get(id=id)
     obj.username=username

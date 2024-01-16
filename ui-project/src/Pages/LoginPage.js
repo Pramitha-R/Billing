@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import './LoginPage.css'
 import { LoginApi } from '../services/API';
-import { Navigate , Link} from 'react-router-dom';
+import { storeUserData } from '../services/storage';
+import { Navigate , Link, useAsyncError,useNavigate} from 'react-router-dom';
+import { isAuthenticated } from '../services/Auth';
+import NavBar from '../components/NavBar';
 
 function LoginPage(){
     const initialStateErrors={
@@ -12,7 +15,8 @@ function LoginPage(){
     const [errors,setErrors]=useState(initialStateErrors)
 
     const[loading,setLoading]=useState(false);
-    const [isAuthonticated,setIsauthonticated]=useState(false)
+    // const [isAuthonticated,setIsauthonticated]=useState(false)
+    const [userdetails,setUserDetails]=useState("");
     const handleSubmit = (event) =>{
         // for Avoiding the loading when i click the register buton
         event.preventDefault();
@@ -29,21 +33,20 @@ function LoginPage(){
         if(!hasError){
             setLoading(true)
             LoginApi(inputs).then((response)=>{
+                // console.log('-----test',response);
                 if (response.data.MsgType=="success"){
-                    setIsauthonticated(true)
-                    console.log(response.data.MsgType);
+                    setUserDetails(response.data)
+                    console.log(response.data,'----response data')
+                    storeUserData(response.data);
                 }
                 
                 else if(response.data.MsgType=="warning"){
-                    setIsauthonticated(false);
-                    // console.log(response.data.MsgType);
+                    // setIsauthonticated(false);
                     setErrors({...errors,custom_error:response.data.msg})
-                    
-                    // console.log("here------------");
                 }
                 else if(response.data.MsgType=="danger"){
-                    setIsauthonticated(false);
-                    // console.log(response.data.MsgType);
+
+                    // setIsauthonticated(false);
                     setErrors({...errors,custom_error:response.data.msg})
                     
                 }
@@ -65,12 +68,23 @@ function LoginPage(){
     const handleInputs = (event) =>{
         setInputs({...inputs,[event.target.name]:event.target.value})
     }
-
-    if (isAuthonticated) {
-        return < Navigate to="/dashboard" />
+    const navigate = useNavigate();
+    if (isAuthenticated()) {
+        // if userdetails.
+        if (userdetails.role_id==1){
+            return < Navigate to="/AdminDashboard" />
+        }
+        else if(userdetails.role_id==2){
+            return navigate("/EmployeeDashboard");
+        }
+        else if(userdetails.role_id==3){
+            return navigate("/CustomerDashboard");
+        }
+        return < Navigate to="/AdminDashboard" />
     }
     return(
     <>
+        <NavBar />
         <section className="login-block">
             <div className="container">
                 <div className="row ">

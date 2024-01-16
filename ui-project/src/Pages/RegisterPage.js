@@ -2,6 +2,9 @@ import { useState } from 'react';
 import './RegisterPage.css'
 import { RegisterAPI } from '../services/API';
 import { Navigate, Link } from 'react-router-dom';
+import NavBar from '../components/NavBar';
+import { isAuthenticated } from "../services/Auth";
+
 function RegisterPage(){
     
     const initialStateErrors={
@@ -17,7 +20,7 @@ function RegisterPage(){
     const [errors,setErrors]=useState(initialStateErrors)
 
     const[loading,setLoading]=useState(false);
-    const [isAuthonticated,setIsauthonticated]=useState(false)
+    // const [isAuthonticated,setIsauthonticated]=useState(false)
 
     const handleSubmit = (event) =>{
         // for Avoiding the loading when i click the register buton
@@ -28,7 +31,6 @@ function RegisterPage(){
             error.username.required=true;
             hasError=true;
         }
-        // console.log('1-----',inputs)
         if(inputs.firstname==""){
             error.firstname.required=true;
             hasError=true;
@@ -53,25 +55,22 @@ function RegisterPage(){
             error.confirm_Password.required=true;
             hasError=true;
         }
-        // console.log('2-----',inputs)
         if(!hasError){
             setLoading(true)
             RegisterAPI(inputs).then((response)=>{
+                // console.log('-----test',response);
                 if (response.data.MsgType=="success"){
-                    setIsauthonticated(true)
-                    console.log(response.data.MsgType);
+                    return < Navigate to="/" />
                 }
                 
                 else if(response.data.MsgType=="warning"){
-                    setIsauthonticated(false);
-                    // console.log(response.data.MsgType);
+                    // setIsauthonticated(false);
                     setErrors({...errors,custom_error:response.data.msg})
                     
                     // console.log("here------------");
                 }
                 else if(response.data.MsgType=="danger"){
-                    setIsauthonticated(false);
-                    // console.log(response.data.MsgType);
+                    // setIsauthonticated(false);
                     setErrors({...errors,custom_error:response.data.msg})
                     
                 }
@@ -100,12 +99,12 @@ function RegisterPage(){
         // console.log('3-----',inputs)
     }
 
-    if (isAuthonticated) {
-        return < Navigate to="/dashboard" />
+    if (isAuthenticated()) {
+        return < Navigate to="/AdminDashboard" />
     }
-
     return (
         <>
+        < NavBar />
          <section className="register-block">
             <div className="container">
                <div className="row">
