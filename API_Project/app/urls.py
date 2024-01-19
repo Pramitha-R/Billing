@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from app import views,ProductView
+from app import views,ProductView,EmployeeView
 # from rest_framework_simplejwt import views as jwt_views
 
 # from rest_framework_simplejwt.views import (
@@ -17,6 +17,8 @@ urlpatterns = [
     path('UpdateUsers/<int:id>',views._Update_User),
     path('ClickToUpdate/<int:id>',views._Click_Update),
     path('DeleteUser/<int:id>',views._Delete_User),
+
+    path('AllEmp_details/',EmployeeView.AllDetails),
     
     path('CreateItems/<int:id>',ProductView._Create_Items),
     path('allProducts/',ProductView._All_Products),

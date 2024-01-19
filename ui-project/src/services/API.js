@@ -5,6 +5,7 @@ axios.defaults.baseURL = 'http://127.0.0.1:7500/';
 
 const REGISTER_URL= 'createUsers/';
 const LOGIN_URL='checklogin/';
+const ALL_EMPLOYEE_DETAILS_URL = 'AllEmp_details/';
 
 // Register the user 
 export const RegisterAPI = (inputs) => {
@@ -34,5 +35,9 @@ export const LoginApi =(inputs) =>{
 export const userdetailsApi =()=>{
     let data = {userdetails: getUserData()}
     return axios.post(data)
-    
+};
+
+export const Emp_Det_Api = () => {
+    // console.log(axios.get(ALL_EMPLOYEE_DETAILS_URL))
+    return axios.get(ALL_EMPLOYEE_DETAILS_URL)
 };

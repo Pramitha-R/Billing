@@ -5,7 +5,8 @@ export const storeUserData=(data)=>{
         'fname': data.firstname,
         'lname': data.lastname,
         'address': data.address,
-        'phone': data.phone
+        'phone': data.phone,
+        'role_id':data.role_id
       }));
     }
 export const getUserData=()=>{

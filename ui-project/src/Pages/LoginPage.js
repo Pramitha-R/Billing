@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './LoginPage.css'
 import { LoginApi } from '../services/API';
-import { storeUserData } from '../services/storage';
+import { storeUserData ,getUserData} from '../services/storage';
 import { Navigate , Link, useAsyncError,useNavigate} from 'react-router-dom';
 import { isAuthenticated } from '../services/Auth';
 import NavBar from '../components/NavBar';
@@ -36,7 +36,7 @@ function LoginPage(){
                 // console.log('-----test',response);
                 if (response.data.MsgType=="success"){
                     setUserDetails(response.data)
-                    console.log(response.data,'----response data')
+                    // console.log(response.data,'----response data')
                     storeUserData(response.data);
                 }
                 
@@ -68,19 +68,21 @@ function LoginPage(){
     const handleInputs = (event) =>{
         setInputs({...inputs,[event.target.name]:event.target.value})
     }
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     if (isAuthenticated()) {
-        // if userdetails.
-        if (userdetails.role_id==1){
+        const getroleid = getUserData();
+        if (getroleid.role_id == 1){
             return < Navigate to="/AdminDashboard" />
         }
-        else if(userdetails.role_id==2){
-            return navigate("/EmployeeDashboard");
+        else if (getroleid.role_id == 2){
+            return < Navigate to="/EmployeeDashboard" />
         }
-        else if(userdetails.role_id==3){
-            return navigate("/CustomerDashboard");
+        else if (getroleid.role_id == 3){
+            return < Navigate to="/CustomerDashboard" />
         }
-        return < Navigate to="/AdminDashboard" />
+        else {
+            return < Navigate to="/CustomerDashboard" />
+        }
     }
     return(
     <>

@@ -4,6 +4,7 @@ import { RegisterAPI } from '../services/API';
 import { Navigate, Link } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import { isAuthenticated } from "../services/Auth";
+import { getUserData } from "../services/storage";
 
 function RegisterPage(){
     
@@ -81,7 +82,6 @@ function RegisterPage(){
             })
         }
         setErrors({...error})
-        // console.log(inputs);
     }
 
     const [inputs,setInputs] =useState({
@@ -100,7 +100,19 @@ function RegisterPage(){
     }
 
     if (isAuthenticated()) {
-        return < Navigate to="/AdminDashboard" />
+        const getroleid = getUserData();
+        if (getroleid.role_id == 1){
+            return < Navigate to="/AdminDashboard" />
+        }
+        else if (getroleid.role_id == 2){
+            return < Navigate to="/EmployeeDashboard" />
+        }
+        else if (getroleid.role_id == 3){
+            return < Navigate to="/CustomerDashboard" />
+        }
+        else {
+            return < Navigate to="/CustomerDashboard" />
+        }
     }
     return (
         <>
